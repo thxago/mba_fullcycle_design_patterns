@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "start": "node -e \"process.env.TZ = 'America/Sao_Paulo'; require('ts-node/register'); require('./src/main.ts');\"",
+    "test": "node -e \"process.env.TZ = 'America/Sao_Paulo'; require('jest').run(process.argv.slice(1));\" -- --runInBand"
+  },
   "dependencies": {
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.1",
