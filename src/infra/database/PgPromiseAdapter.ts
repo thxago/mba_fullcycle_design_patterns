@@ -1,4 +1,4 @@
-import DatabaseConnection from "./DatabaseConnection";
+import DatabaseConnection, { TransactionConnection } from "./DatabaseConnection";
 import pgp from "pg-promise";
 
 export default class PgPromiseAdapter implements DatabaseConnection {
@@ -10,6 +10,12 @@ export default class PgPromiseAdapter implements DatabaseConnection {
 
 	query(statement: string, params: any): Promise<any> {
 		return this.connection.query(statement, params);
+	}
+
+	transaction<T>(work: (connection: TransactionConnection) => Promise<T>): Promise<T> {
+		return this.connection.tx((transaction: any) => work({
+			query: (statement: string, params: any) => transaction.query(statement, params)
+		}));
 	}
 
 	close(): Promise<void> {
