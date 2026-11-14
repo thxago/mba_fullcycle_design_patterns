@@ -77,14 +77,14 @@ docker run --detach --name faturamento-validacao-api --network container:faturam
 docker logs faturamento-validacao-api
 ```
 
-Espere a API iniciar antes das requisições abaixo. Nessa alternativa, use `$api = "http://localhost:33000"`. Nos comandos de validação, `docker logs faturamento-validacao-api` permite conferir os resumos publicados.
+Espere a API iniciar antes das requisições abaixo. Nessa alternativa, use `$api = "http://127.0.0.1:33000"`, pois a porta foi publicada somente em IPv4. Nos comandos de validação, `docker logs faturamento-validacao-api` permite conferir os resumos publicados.
 
 ## Roteiro de validação HTTP
 
 Com a API ativa, em outro PowerShell:
 
 ```powershell
-$api = "http://localhost:3000" # No ambiente Docker isolado: http://localhost:33000
+$api = "http://localhost:3000" # No ambiente Docker isolado: http://127.0.0.1:33000
 $accrual = '{"month":1,"year":2022,"type":"accrual"}'
 $cashCsv = '{"month":1,"year":2022,"type":"cash","format":"csv"}'
 $simulation = '{"month":1,"year":2022,"type":"accrual","format":"csv"}'
@@ -169,6 +169,7 @@ O contrato HTTP usa callbacks assíncronos na ordem **`(params, body, headers, q
 - Não há tratamento global de erros HTTP: uma exceção pode encerrar a API, como no projeto base. Use entradas válidas no roteiro HTTP.
 - Um fechamento por vez é a premissa. Não há autenticação, controle de concorrência, edição individual ou envio real de email; SendEmail continua sendo um stub de console.
 - O N+1 de payments, as regras das strategies e a organização em camadas foram mantidos. Reinicie a API se recriar o schema para não reutilizar um pool anterior ao reseed.
+- As dependências originais emitem avisos de depreciação e auditoria no `npm install`. Atualizações dessas dependências ficaram fora do escopo; esta base didática não deve ser utilizada diretamente em produção.
 
 ## Encerrar a validação Docker
 
