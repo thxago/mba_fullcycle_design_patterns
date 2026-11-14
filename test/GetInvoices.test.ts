@@ -37,7 +37,7 @@ test.each([
 	{ type: "cash", format: "xml", message: "Invalid format" },
 	{ type: "unknown", format: undefined, message: "Invalid type" }
 ])("Deve rejeitar $message antes de consultar", async function ({ type, format, message }) {
-	await expect(getInvoices.execute({ month: 1, year: 2022, type, format })).rejects.toThrow(message);
+	await expect(getInvoices.execute({ month: 1, year: 2022, type, format })).rejects.toThrow(new Error(message));
 
 	expect(invoiceRepository.listPeriod).not.toHaveBeenCalled();
 	expect(invoiceRepository.replacePeriod).not.toHaveBeenCalled();

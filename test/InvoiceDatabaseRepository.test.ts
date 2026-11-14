@@ -43,8 +43,11 @@ test("Deve reprocessar sem duplicar nem alterar outros periodos ou regimes", asy
 });
 
 test("Deve preservar o fechamento anterior quando uma fatura do novo lote falha", async function () {
-	await invoiceRepository.replacePeriod(1, year, "accrual", [invoice]);
-	const previous = await connection.query("select * from branas.invoice where year = $1", [year]);
+	await invoiceRepository.replacePeriod(1, year, "accrual", [
+		invoice,
+		{ ...invoice, date: new Date(`${year}-01-10T10:00:00`), amount: 250 }
+	]);
+	const previous = await connection.query("select * from branas.invoice where year = $1 order by id_invoice", [year]);
 	const contractRepository = {
 		async list () {
 			return [
@@ -56,7 +59,21 @@ test("Deve preservar o fechamento anterior quando uma fatura do novo lote falha"
 	const publish = jest.fn(async () => {});
 	const closeInvoicing = new CloseInvoicing(contractRepository, invoiceRepository, new DynamicPresenterFactory(), { publish });
 	await expect(closeInvoicing.execute({ month: 1, year, type: "accrual" })).rejects.toMatchObject({ code: "23503" });
+	expect(await connection.query("select * from branas.invoice where year = $1 order by id_invoice", [year])).toEqual(previous);
+	expect(publish).not.toHaveBeenCalled();
+});
+
+test("Deve preservar faturas anteriores quando o fechamento solicita formato invalido", async function () {
+	await invoiceRepository.replacePeriod(1, year, "accrual", [invoice]);
+	const previous = await connection.query("select * from branas.invoice where year = $1", [year]);
+	const list = jest.fn(async () => [new Contract(idContract, "", 6000, 12, invoice.date)]);
+	const publish = jest.fn(async () => {});
+	const closeInvoicing = new CloseInvoicing({ list }, invoiceRepository, new DynamicPresenterFactory(), { publish });
+
+	await expect(closeInvoicing.execute({ month: 1, year, type: "accrual", format: "xml" })).rejects.toThrow(new Error("Invalid format"));
+
 	expect(await connection.query("select * from branas.invoice where year = $1", [year])).toEqual(previous);
+	expect(list).not.toHaveBeenCalled();
 	expect(publish).not.toHaveBeenCalled();
 });
 

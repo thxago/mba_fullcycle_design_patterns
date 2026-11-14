@@ -22,5 +22,5 @@ test("Deve resolver CSV preservando o formato de cada linha", function () {
 });
 
 test.each(["xml", "", "JSON"])("Deve rejeitar o formato desconhecido %s", function (format) {
-	expect(() => new DynamicPresenterFactory().create(format)).toThrow("Invalid format");
+	expect(() => new DynamicPresenterFactory().create(format)).toThrow(new Error("Invalid format"));
 });

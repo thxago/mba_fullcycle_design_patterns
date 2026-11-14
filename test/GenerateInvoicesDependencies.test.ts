@@ -63,7 +63,7 @@ test("Deve rejeitar formato invalido antes de carregar contratos ou publicar eve
 
 	await expect(generateInvoices.execute({
 		month: 1, year: 2022, type: "accrual", format: "xml"
-	})).rejects.toThrow("Invalid format");
+	})).rejects.toThrow(new Error("Invalid format"));
 
 	expect(list).not.toHaveBeenCalled();
 	expect(publish).not.toHaveBeenCalled();

@@ -60,7 +60,7 @@ test.each([
 ])("Deve rejeitar $message sem efeitos, mesmo sem contratos", async function ({ type, format, message }) {
 	jest.spyOn(contractRepository, "list").mockResolvedValue([]);
 
-	await expect(closeInvoicing.execute({ month: 1, year: 2022, type, format })).rejects.toThrow(message);
+	await expect(closeInvoicing.execute({ month: 1, year: 2022, type, format })).rejects.toThrow(new Error(message));
 
 	expect(contractRepository.list).not.toHaveBeenCalled();
 	expect(invoiceRepository.replacePeriod).not.toHaveBeenCalled();
