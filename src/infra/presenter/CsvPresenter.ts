@@ -1,10 +1,9 @@
-import { Output } from "../../application/usecase/GenerateInvoices";
 import Presenter from "../../application/presenter/Presenter";
 import moment from "moment";
 
-export default class CsvPresenter implements Presenter {
+export default class CsvPresenter implements Presenter<CsvRow[]> {
 
-	present(output: Output[]): any {
+	present(output: CsvRow[]): string {
 		const lines: any[] = [];
 		for (const data of output) {
 			const line: string[] = [];
@@ -12,7 +11,13 @@ export default class CsvPresenter implements Presenter {
 			line.push(`${data.amount}`);
 			lines.push(line.join(";"));
 		}
+
 		return lines.join("\n");
 	}
 
+}
+
+type CsvRow = {
+	date: Date,
+	amount: number
 }
