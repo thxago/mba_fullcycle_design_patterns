@@ -59,10 +59,10 @@ Use nomes de containers livres e a porta **33000** disponível. O banco não pub
 
 ```powershell
 docker run --detach --name faturamento-validacao-db --publish 127.0.0.1:33000:3000 --env POSTGRES_DB=app --env POSTGRES_PASSWORD=123456 --env TZ=America/Sao_Paulo postgres:16
-docker exec faturamento-validacao-db pg_isready -U postgres -d app
+docker exec faturamento-validacao-db pg_isready -h 127.0.0.1 -U postgres -d app
 ```
 
-Espere `pg_isready` informar `accepting connections`, repetindo esse comando se necessário. Apenas nesse banco descartável, confira a criação do zero e a reexecução:
+Espere `pg_isready` por TCP informar `accepting connections`, repetindo esse comando se necessário. O host explícito evita confundir o servidor temporário de inicialização, acessível apenas por socket, com o banco definitivo. Apenas nesse banco descartável, confira a criação do zero e a reexecução:
 
 ```powershell
 docker exec faturamento-validacao-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "drop database if exists app;"
