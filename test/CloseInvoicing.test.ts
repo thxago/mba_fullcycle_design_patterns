@@ -18,6 +18,7 @@ beforeEach(() => {
 	contractRepository = { list: jest.fn(async () => [contract]) };
 	steps = [];
 	invoiceRepository = {
+		listPeriod: jest.fn(async () => []),
 		replacePeriod: jest.fn(async () => {
 			await Promise.resolve();
 			steps.push("persist");
@@ -40,6 +41,7 @@ test.each([
 	expect(output).toEqual(format === "csv" ? "2022-01-05;6000" : [{ date: new Date(date), amount }]);
 	expect(mediator.publish).toHaveBeenCalledWith("InvoicesClosed", { month: 1, year: 2022, type, invoices: 1, total: amount });
 	expect(steps).toEqual(["persist", "publish"]);
+	expect(invoiceRepository.listPeriod).not.toHaveBeenCalled();
 });
 
 test.each([false, true])("Deve substituir por lote vazio e publicar resumo zero, sem contratos: %s", async function (noContracts) {

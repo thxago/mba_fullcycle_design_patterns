@@ -67,3 +67,17 @@ test("Deve remover faturas anteriores ao substituir por lote vazio", async funct
 
 	expect(await connection.query("select type from branas.invoice where year = $1", [year])).toEqual([{ type: "cash" }]);
 });
+
+test("Deve consultar apenas o periodo e regime em ordem de data com valores numericos", async function () {
+	const first = { ...invoice, date: new Date(`${year}-01-02T10:00:00`), amount: 500 };
+	const last = { ...invoice, date: new Date(`${year}-01-10T10:00:00`), amount: 750.5 };
+	await invoiceRepository.replacePeriod(1, year, "accrual", [last, first]);
+	await invoiceRepository.replacePeriod(1, year, "cash", [invoice]);
+	await invoiceRepository.replacePeriod(2, year, "accrual", [invoice]);
+
+	expect(await invoiceRepository.listPeriod(1, year, "accrual")).toEqual([
+		{ date: first.date, amount: first.amount },
+		{ date: last.date, amount: last.amount }
+	]);
+	expect(await invoiceRepository.listPeriod(3, year, "accrual")).toEqual([]);
+});
